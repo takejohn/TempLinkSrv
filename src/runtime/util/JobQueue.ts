@@ -1,5 +1,3 @@
-import { resolve } from 'std/path';
-
 /**
  * 非同期タスクを追加された順に実行するジョブキュー。
  */
