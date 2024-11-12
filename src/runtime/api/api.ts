@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 const API_VERSION = 1;
 
 export interface ResponseBody {
@@ -12,12 +14,15 @@ export interface ErrorResponse extends ResponseBody {
     error: ErrorValue;
 }
 
-export interface ResponseValue {
-    type: string;
-}
+export const zResponseValue = z.object({
+    type: z.string(),
+});
+
+export type ResponseValue = z.infer<typeof zResponseValue>;
 
 export interface ErrorValue extends ResponseValue {
     description: string;
+    issues?: unknown;
 }
 
 export function resultOk(value: ResponseValue | null): OkResponse {

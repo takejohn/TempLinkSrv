@@ -2,37 +2,27 @@ import { Registry } from '../server/Registry.ts';
 import { ClientError } from './errors.ts';
 import { CONFIG } from '../../setup/index.ts';
 import { LinkRecord } from '../database/LinkRecord.ts';
-import { ResponseValue } from './api.ts';
-import { requireNumberProperty, requireStringProperty } from '../../common/objects.ts';
+import { zResponseValue } from './api.ts';
+import { z } from 'zod';
 
-export interface LinkRequest {
-    destination: string;
-    expirationTime: number;
-}
+export const zLinkRequest = z.object({
+    destination: z.string(),
+    expirationTime: z.number(),
+});
 
-export interface LinkResource extends ResponseValue {
-    type: 'link_resource';
-    link: string;
-    id: string;
-    destination: string;
-    expiration_time: number;
-    creation_date: number;
-    expiration_date: number;
-}
+export type LinkRequest = z.infer<typeof zLinkRequest>;
 
-export function requireLinkRequest(body: unknown): LinkRequest {
-    if (!(body instanceof Object)) {
-        throw new ClientError('The request body must be an object');
-    }
-    try {
-        return {
-            destination: requireStringProperty(body, 'destination'),
-            expirationTime: requireNumberProperty(body, 'expiration_time'),
-        };
-    } catch (e) {
-        throw new ClientError(e.message);
-    }
-}
+const zLinkResource = zResponseValue.extend({
+    type: z.literal('link_resource'),
+    link: z.string(),
+    id: z.string(),
+    destination: z.string(),
+    expiration_time: z.number(),
+    creation_date: z.number(),
+    expiration_date: z.number(),
+});
+
+export type LinkResource = z.infer<typeof zLinkResource>;
 
 export class LinkAPI {
     public static readonly instance = new LinkAPI();

@@ -2,7 +2,6 @@ import { Context, Hono } from 'hono';
 import ipRangeCheck from 'ip-range-check';
 
 import { authenticationMiddleware } from '../authentication/authenticationMiddleware.ts';
-import { requireLinkRequest } from './LinkAPI.ts';
 import { LinkAPI } from './LinkAPI.ts';
 import { ClientError } from './errors.ts';
 import { ServerConsole } from '../server/ServerConsole.ts';
@@ -10,6 +9,8 @@ import { resultOk } from './api.ts';
 import { resultError } from './api.ts';
 import { Bindings } from '../server/TempLinkSrv.ts';
 import { CONFIG } from '../../setup/index.ts';
+import { ZodError } from 'zod';
+import { zLinkRequest } from './LinkAPI.ts';
 
 export const linkApiRouter = new Hono<{ Bindings: Bindings }>();
 
@@ -40,7 +41,7 @@ linkApiRouter.use('*', async (c, next) => {
 linkApiRouter.post(
     '/',
     async (c) => {
-        const request = requireLinkRequest(await c.req.json());
+        const request = zLinkRequest.parse(await c.req.json());
         const result = await LinkAPI.instance.create(request);
         const response = resultOk(result);
         c.status(201);
@@ -75,6 +76,14 @@ linkApiRouter.onError((e, c) => {
         const response = resultError({
             type: 'error',
             description: e.clientMessage,
+        });
+        return c.body(JSON.stringify(response));
+    } else if (e instanceof ZodError) {
+        c.status(400);
+        const response = resultError({
+            type: 'error',
+            description: e.message,
+            issues: e.issues,
         });
         return c.body(JSON.stringify(response));
     } else {

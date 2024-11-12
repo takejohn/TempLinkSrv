@@ -26,8 +26,10 @@
         "hono": "https://deno.land/x/hono@v4.0.4/mod.ts",
         "hono/middleware": "https://deno.land/x/hono@v4.0.4/middleware.ts",
         "hono/utils/http-status": "https://deno.land/x/hono@v4.0.4/utils/http-status.ts",
+        "hono/zod-openapi": "npm:@hono/zod-openapi",
         "ip-range-check": "npm:ip-range-check@0.2.0",
         "mongo": "https://deno.land/x/mongo@v0.32.0/mod.ts",
-        "yaml": "npm:yaml@2.3.4"
+        "yaml": "npm:yaml@2.3.4",
+        "zod": "https://deno.land/x/zod@v3.22.4/mod.ts"
     }
 }
